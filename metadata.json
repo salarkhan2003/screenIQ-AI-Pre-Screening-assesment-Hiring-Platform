@@ -1,0 +1,7 @@
+{
+  "name": "ScreenIQ - AI Pre-Screening Recruitment Platform",
+  "description": "An automated hiring infrastructure that uses AI to generate role-based assessments, screen candidates, and provide recruiters with a prioritized pipeline of qualified talent.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
