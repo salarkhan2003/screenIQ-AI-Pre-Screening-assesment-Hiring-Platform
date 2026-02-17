@@ -1,7 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, User, Briefcase, ChevronRight, LogIn, CheckCircle, XCircle, Search, BarChart2, LogOut } from 'lucide-react';
+import { 
+  LayoutDashboard, PlusCircle, User, Briefcase, ChevronRight, 
+  LogIn, CheckCircle, XCircle, Search, BarChart2, LogOut,
+  Menu, X 
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Job, Candidate, Assessment, CandidateStatus } from './types';
 import RecruiterDashboard from './views/RecruiterDashboard';
 import CreateJob from './views/CreateJob';
@@ -73,63 +78,6 @@ const INITIAL_JOBS: Job[] = [
     knockoutQuestions: [],
     rejectionDelay: '3 Days',
     autoNotify: true
-  },
-  {
-    id: 'j4',
-    title: 'Systems Architect',
-    company: 'Tesla',
-    description: 'Architecting the software backbone for autonomous driving and energy systems.',
-    department: 'Engineering',
-    experienceLevel: 'Lead',
-    skills: ['C++', 'Python', 'RTOS'],
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    cutoffScore: 85,
-    isProctoringEnabled: true,
-    difficultySetting: 'Senior',
-    marketBenchmarkScore: 90,
-    idealSkillProfile: { 'Systems': 98, 'Math': 95, 'Logic': 90 },
-    knockoutQuestions: [],
-    rejectionDelay: '7 Days',
-    autoNotify: true
-  },
-  {
-    id: 'j5',
-    title: 'Growth Marketing Lead',
-    company: 'Spotify',
-    description: 'Scale our user acquisition channels across global markets. Data-driven mindset is essential.',
-    department: 'Marketing',
-    experienceLevel: 'Senior',
-    skills: ['SEO', 'Performance Marketing', 'SQL'],
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    cutoffScore: 70,
-    isProctoringEnabled: true,
-    difficultySetting: 'Mid',
-    marketBenchmarkScore: 78,
-    idealSkillProfile: { 'Growth': 90, 'Analytics': 85, 'Domain': 80 },
-    knockoutQuestions: [],
-    rejectionDelay: '24 Hours',
-    autoNotify: true
-  },
-  {
-    id: 'j6',
-    title: 'Fullstack Engineer',
-    company: 'Stripe',
-    description: 'Build the economic infrastructure for the internet. Work across the stack to deliver elegant payment experiences.',
-    department: 'Engineering',
-    experienceLevel: 'Mid',
-    skills: ['Ruby', 'React', 'API Design'],
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    cutoffScore: 80,
-    isProctoringEnabled: true,
-    difficultySetting: 'Mid',
-    marketBenchmarkScore: 88,
-    idealSkillProfile: { 'Engineering': 95, 'Product': 80, 'Logic': 90 },
-    knockoutQuestions: [],
-    rejectionDelay: 'Instant',
-    autoNotify: true
   }
 ];
 
@@ -170,62 +118,126 @@ const INITIAL_CANDIDATES: Candidate[] = [
   }
 ];
 
+// Helper to render shared sidebar content
+const SidebarContent: React.FC<{ 
+  role: 'recruiter' | 'candidate', 
+  setRole: (r: 'recruiter' | 'candidate') => void,
+  onNav?: () => void 
+}> = ({ role, setRole, onNav }) => {
+  const navigate = useNavigate();
+  return (
+    <>
+      <div className="p-6">
+        <h1 className="text-2xl font-black text-indigo-600 flex items-center gap-2 italic tracking-tighter">
+          <CheckCircle className="w-8 h-8" /> ScreenIQ
+        </h1>
+        <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-[0.3em] font-black">AI Infrastructure</p>
+      </div>
+
+      <nav className="flex-1 px-4 space-y-1">
+        <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="Leaderboard" onClick={onNav} />
+        {role === 'recruiter' ? (
+          <>
+            <SidebarLink to="/jobs/create" icon={<PlusCircle size={20} />} label="Deploy Gate" onClick={onNav} />
+            <SidebarLink to="/analytics" icon={<BarChart2 size={20} />} label="Analytics" onClick={onNav} />
+          </>
+        ) : (
+          <>
+            <SidebarLink to="/browse" icon={<Search size={20} />} label="Find Jobs" onClick={onNav} />
+            <SidebarLink to="/applications" icon={<Briefcase size={20} />} label="Applications" onClick={onNav} />
+          </>
+        )}
+      </nav>
+
+      <div className="p-4 border-t mt-auto space-y-2">
+        <button 
+          onClick={() => {
+            setRole(role === 'recruiter' ? 'candidate' : 'recruiter');
+            onNav?.();
+          }}
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition-all text-[10px] font-black uppercase tracking-widest"
+        >
+          <LogIn size={16} /> Switch to {role === 'recruiter' ? 'Candidate' : 'Recruiter'}
+        </button>
+        <button 
+          onClick={() => {
+            navigate('/');
+            onNav?.();
+          }}
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-red-50 hover:bg-red-100 text-red-600 rounded-2xl transition-all text-[10px] font-black uppercase tracking-widest"
+        >
+          <LogOut size={16} /> Exit Platform
+        </button>
+      </div>
+    </>
+  );
+};
+
 const DashboardLayout: React.FC<{ 
   role: 'recruiter' | 'candidate', 
   setRole: (r: 'recruiter' | 'candidate') => void,
   children: React.ReactNode 
 }> = ({ role, setRole, children }) => {
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50">
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans">
+      {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between p-4 bg-white border-b sticky top-0 z-50">
-        <span className="font-bold text-xl text-indigo-600">ScreenIQ</span>
-        <button onClick={() => setRole(role === 'recruiter' ? 'candidate' : 'recruiter')} className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-medium">
-          Switch to {role === 'recruiter' ? 'Candidate' : 'Recruiter'}
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 hover:bg-slate-100 rounded-xl transition-all"
+          >
+            <Menu size={24} className="text-slate-600" />
+          </button>
+          <span className="font-black text-xl text-indigo-600 italic tracking-tighter">ScreenIQ</span>
+        </div>
+        <button 
+          onClick={() => setRole(role === 'recruiter' ? 'candidate' : 'recruiter')} 
+          className="text-[9px] bg-indigo-600 text-white px-3 py-1.5 rounded-full font-black uppercase tracking-widest shadow-md"
+        >
+          {role === 'recruiter' ? 'Candidate' : 'Recruiter'}
         </button>
       </div>
 
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] md:hidden"
+            />
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 left-0 w-72 bg-white z-[70] md:hidden shadow-2xl flex flex-col border-r border-slate-100"
+            >
+              <div className="absolute top-6 right-6">
+                <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-slate-100 rounded-xl">
+                  <X size={20} className="text-slate-400" />
+                </button>
+              </div>
+              <SidebarContent role={role} setRole={setRole} onNav={() => setIsSidebarOpen(false)} />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop Persistent Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r fixed h-full overflow-y-auto z-40">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-indigo-600 flex items-center gap-2">
-            <CheckCircle className="w-8 h-8" /> ScreenIQ
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold">AI Pre-Screening</p>
-        </div>
-
-        <nav className="flex-1 px-4 space-y-1">
-          <SidebarLink to="/dashboard" icon={<LayoutDashboard size={20} />} label="Dashboard" />
-          {role === 'recruiter' ? (
-            <>
-              <SidebarLink to="/jobs/create" icon={<PlusCircle size={20} />} label="Post a Job" />
-              <SidebarLink to="/analytics" icon={<BarChart2 size={20} />} label="Analytics" />
-            </>
-          ) : (
-            <>
-              <SidebarLink to="/browse" icon={<Search size={20} />} label="Find Jobs" />
-              <SidebarLink to="/applications" icon={<Briefcase size={20} />} label="My Applications" />
-            </>
-          )}
-        </nav>
-
-        <div className="p-4 border-t mt-auto space-y-2">
-          <button 
-            onClick={() => setRole(role === 'recruiter' ? 'candidate' : 'recruiter')}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-xs font-medium"
-          >
-            <LogIn size={16} /> Switch to {role === 'recruiter' ? 'Candidate' : 'Recruiter'}
-          </button>
-          <button 
-            onClick={() => navigate('/')}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors text-xs font-black uppercase tracking-widest"
-          >
-            <LogOut size={16} /> Exit Platform
-          </button>
-        </div>
+        <SidebarContent role={role} setRole={setRole} />
       </aside>
 
       <main className="flex-1 md:ml-64 bg-slate-50 min-h-screen">
-        <div className="max-w-7xl mx-auto p-4 md:p-8">
+        <div className="max-w-7xl mx-auto p-4 md:p-10">
           {children}
         </div>
       </main>
@@ -286,17 +298,18 @@ const App: React.FC = () => {
   );
 };
 
-const SidebarLink: React.FC<{ to: string, icon: React.ReactNode, label: string }> = ({ to, icon, label }) => {
+const SidebarLink: React.FC<{ to: string, icon: React.ReactNode, label: string, onClick?: () => void }> = ({ to, icon, label, onClick }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
   return (
     <Link 
       to={to} 
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive ? 'bg-indigo-50 text-indigo-700 font-bold shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'}`}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 ${isActive ? 'bg-indigo-600 text-white font-black shadow-lg shadow-indigo-100' : 'text-slate-400 hover:bg-slate-50 hover:text-indigo-600'}`}
     >
-      {icon}
-      <span>{label}</span>
-      {isActive && <ChevronRight size={16} className="ml-auto" />}
+      <div className={isActive ? 'text-white' : 'text-slate-300 group-hover:text-indigo-600 transition-colors'}>{icon}</div>
+      <span className="text-[11px] font-black uppercase tracking-widest">{label}</span>
+      {isActive && <ChevronRight size={14} className="ml-auto opacity-40" />}
     </Link>
   );
 };

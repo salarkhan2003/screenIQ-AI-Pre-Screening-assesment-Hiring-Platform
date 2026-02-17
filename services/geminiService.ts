@@ -2,6 +2,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Job, Question, CandidateAnswer } from "../types";
 
+// Always use named parameters for initialization and exclusively use process.env.API_KEY.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const cleanAIResponse = (text: string) => {
@@ -20,6 +21,7 @@ export const optimizeJobDescription = async (job: Partial<Job>) => {
     contents: prompt,
   });
 
+  // Accessing text as a property, not a method, as per guidelines.
   return cleanAIResponse(response.text || '');
 };
 
@@ -38,11 +40,12 @@ export const getAssessmentBriefing = async (job: Job) => {
   return cleanAIResponse(response.text || '');
 };
 
+// Use gemini-3-pro-preview for complex reasoning task: generating an assessment based on JD and resume context.
 export const generateAssessment = async (job: Job, candidateResume?: string): Promise<Question[]> => {
   const context = candidateResume ? `Candidate Resume Context: ${candidateResume}` : "No resume provided yet.";
   
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3-pro-preview',
     contents: `Generate a RoleScreen AI "Intersection Engine" assessment (10-Bit) for:
       Job Title: ${job.title}
       Required Skills: ${job.skills.join(', ')}
@@ -88,6 +91,7 @@ export const generateAssessment = async (job: Job, candidateResume?: string): Pr
   }
 };
 
+// Use gemini-3-pro-preview for complex reasoning task: evaluating assessment performance and providing feedback.
 export const evaluateAssessment = async (
   job: Job, 
   questions: Question[], 
@@ -111,7 +115,7 @@ export const evaluateAssessment = async (
     'suitability' is a 0-100 score.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3-pro-preview',
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -158,6 +162,7 @@ export const evaluateAssessment = async (
   }
 };
 
+// Use gemini-3-pro-preview for complex reasoning task: generating deep-dive interview questions.
 export const generateInterviewScript = async (job: Job, feedback: string, skills: string[]) => {
   const prompt = `Generate 5 deep-dive interview questions for ${job.title}.
     Focus on gaps: ${feedback}.
@@ -165,7 +170,7 @@ export const generateInterviewScript = async (job: Job, feedback: string, skills
     No markdown.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3-pro-preview',
     contents: prompt,
   });
 
