@@ -4,16 +4,13 @@ import { Job, Question, CandidateAnswer } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-/**
- * Utility to strip Markdown symbols like #, *, and ` for a cleaner UI.
- */
 const cleanAIResponse = (text: string) => {
   return text.replace(/[#*`]/g, '').trim();
 };
 
 export const optimizeJobDescription = async (job: Partial<Job>) => {
-  const prompt = `Optimize the following job description to be more professional and clear. 
-    Detect unrealistic skill combinations and suggest improvements.
+  const prompt = `Optimize this JD for RoleScreen AI (2026 hiring landscape). 
+    Detect unrealistic skill combinations.
     Title: ${job.title}
     Skills: ${job.skills?.join(', ')}
     Description: ${job.description}`;
@@ -27,13 +24,11 @@ export const optimizeJobDescription = async (job: Partial<Job>) => {
 };
 
 export const getAssessmentBriefing = async (job: Job) => {
-  const prompt = `Based on this job description:
+  const prompt = `Provide a concise 10-Bit Assessment Briefing for:
     Title: ${job.title}
     Skills: ${job.skills.join(', ')}
-    Description: ${job.description}
     
-    Provide a concise "Pre-Flight Briefing" for a candidate. 
-    List exactly 3-4 specific technical topics the assessment will cover and mention that the test is adaptive.`;
+    Mention that the test uses our Intersection Engine to verify specific resume claims and is adaptive.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
@@ -43,19 +38,20 @@ export const getAssessmentBriefing = async (job: Job) => {
   return cleanAIResponse(response.text || '');
 };
 
-export const generateAssessment = async (job: Job): Promise<Question[]> => {
+export const generateAssessment = async (job: Job, candidateResume?: string): Promise<Question[]> => {
+  const context = candidateResume ? `Candidate Resume Context: ${candidateResume}` : "No resume provided yet.";
+  
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Generate a role-based assessment question pool for:
+    contents: `Generate a RoleScreen AI "Intersection Engine" assessment (10-Bit) for:
       Job Title: ${job.title}
       Required Skills: ${job.skills.join(', ')}
+      ${context}
       
-      CRITICAL: ONLY multiple_choice questions are allowed.
-      
-      Generate EXACTLY 10 questions:
-      - 3 Easy
-      - 4 Medium
-      - 3 Hard
+      CRITICAL: 
+      - Include 3 "Truth Questions" that specifically cross-reference claims in the resume vs JD requirements.
+      - Total EXACTLY 10 multiple_choice questions.
+      - Use 'elite' difficulty for high-performers.
       
       Return a JSON array of objects.`,
     config: {
@@ -70,8 +66,9 @@ export const generateAssessment = async (job: Job): Promise<Question[]> => {
             type: { type: Type.STRING, description: "must be 'multiple_choice'" },
             options: { type: Type.ARRAY, items: { type: Type.STRING } },
             correctAnswer: { type: Type.STRING },
-            difficulty: { type: Type.STRING, description: "easy, medium, or hard" },
-            skill: { type: Type.STRING }
+            difficulty: { type: Type.STRING, description: "easy, medium, hard, or elite" },
+            skill: { type: Type.STRING },
+            isTruthQuestion: { type: Type.BOOLEAN }
           },
           required: ["id", "text", "type", "options", "correctAnswer", "difficulty", "skill"]
         }
@@ -99,21 +96,19 @@ export const evaluateAssessment = async (
   const qaString = questions.map(q => {
     const ans = answers[q.id];
     const isCorrect = ans?.value === q.correctAnswer;
-    return `Q (${q.difficulty}, ${q.skill}): ${q.text}
-    Correct Answer: ${q.correctAnswer}
+    return `Q (${q.difficulty}, ${q.skill}, TruthQuestion: ${q.isTruthQuestion}): ${q.text}
     Candidate Answer: ${ans?.value || 'N/A'}
     Correct: ${isCorrect}
     Time: ${ans?.timeTaken || 0}s`;
   }).join('\n\n');
 
-  const prompt = `Evaluate the candidate's performance for the ${job.title} position based on 10 MCQ questions.
-    Each correct answer is worth 10 points. Maximum score is 100.
-    
+  const prompt = `Evaluate the candidate for the ${job.title} role using RoleScreen AI metrics.
     Data:
     ${qaString}
     
-    Return the evaluation in JSON format. Calculate 'score' as number of correct answers * 10.
-    Suitability should be a weighted score (score * 0.8 + speed_factor * 0.2).`;
+    Return JSON. 
+    'oneSentenceVerdict' must be a punchy summary like: "Expert logic, but Truth Questions revealed shallow SQL experience."
+    'suitability' is a 0-100 score.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
@@ -126,6 +121,7 @@ export const evaluateAssessment = async (
           score: { type: Type.NUMBER },
           suitability: { type: Type.NUMBER },
           feedback: { type: Type.STRING },
+          oneSentenceVerdict: { type: Type.STRING },
           skillBreakdown: {
             type: Type.OBJECT,
             properties: {
@@ -139,7 +135,7 @@ export const evaluateAssessment = async (
             items: { type: Type.STRING }
           }
         },
-        required: ["score", "suitability", "feedback", "studySuggestions"]
+        required: ["score", "suitability", "feedback", "oneSentenceVerdict", "studySuggestions"]
       }
     }
   });
@@ -149,23 +145,24 @@ export const evaluateAssessment = async (
     return {
       ...data,
       feedback: cleanAIResponse(data.feedback),
-      studySuggestions: data.studySuggestions.map((s: string) => cleanAIResponse(s))
+      oneSentenceVerdict: cleanAIResponse(data.oneSentenceVerdict)
     };
   } catch (e) {
     return { 
       score: 0, 
       suitability: 0, 
-      feedback: "Error evaluating assessment", 
-      studySuggestions: ["Review job fundamentals", "Practice speed", "Analyze mistakes"]
+      feedback: "Error evaluating", 
+      oneSentenceVerdict: "System processing error during verdict generation.",
+      studySuggestions: ["Review job fundamentals"]
     };
   }
 };
 
 export const generateInterviewScript = async (job: Job, feedback: string, skills: string[]) => {
-  const prompt = `Based on the candidate's assessment for ${job.title}, create 5 high-impact interview questions.
-    Candidate traits: ${feedback}.
-    Focus on gaps in ${skills.join(', ')}.
-    Return exactly 5 questions. No markdown.`;
+  const prompt = `Generate 5 deep-dive interview questions for ${job.title}.
+    Focus on gaps: ${feedback}.
+    Target skills: ${skills.join(', ')}.
+    No markdown.`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',

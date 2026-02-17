@@ -349,6 +349,7 @@ const StatusPill = ({ status }: { status: CandidateStatus }) => {
   const styles: Record<CandidateStatus, string> = {
     [CandidateStatus.APPLIED]: 'bg-indigo-50 text-indigo-700',
     [CandidateStatus.SHORTLISTED]: 'bg-emerald-50 text-emerald-700',
+    [CandidateStatus.POTENTIAL]: 'bg-amber-50 text-amber-700',
     [CandidateStatus.REJECTED]: 'bg-red-50 text-red-700',
     [CandidateStatus.INTERVIEW_SCHEDULED]: 'bg-amber-50 text-amber-700',
     [CandidateStatus.INVITED_TO_ASSESSMENT]: 'bg-orange-50 text-orange-700 border-orange-100',

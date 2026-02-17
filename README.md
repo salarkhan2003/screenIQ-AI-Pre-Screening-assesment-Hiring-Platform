@@ -1,82 +1,46 @@
-# ScreenIQ | AI-Powered Recruitment Infrastructure
+# RoleScreen AI | First-Gate Recruitment Infrastructure (2026)
 
-![ScreenIQ Banner](https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=2000)
+![RoleScreen Banner](https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&q=80&w=2000)
 
-**ScreenIQ** is a next-generation, automated hiring infrastructure that eliminates manual screening. By leveraging the **Google Gemini 3.0 API**, it generates role-specific technical assessments, monitors candidate integrity in real-time, and provides recruiters with a prioritized, verified talent pipeline.
+**RoleScreen AI** is a specialized recruitment infrastructure designed for the trustless hiring landscape of 2026. It replaces traditional resume parsing with **Generative Verification**, cross-referencing candidate claims against JD requirements in real-time.
 
-## 🚀 The Vision
-In the modern talent market, resumes are often unreliable and manual screening is a massive bottleneck. ScreenIQ shifts the paradigm from "trust-based applications" to **"verification-first hiring"**. Every candidate who reaches your dashboard has already proven their technical mastery through an adaptive, proctored AI gate.
+## 🚀 The Core Infrastructure
+
+### The Intersection Engine
+Unlike legacy platforms with static question banks, RoleScreen AI cross-references a candidate's specific resume claims against JD requirements to generate **"Truth Questions."** 
+*Example: "You optimized SQL by 40%? Walk through the execution plan you used. Which indexes were redundant?"*
+
+### 10-Bit Assessments
+A 10-minute, mobile-optimized "Verification Step" that replaces the traditional first-round recruiter call. High-performers trigger **Adaptive Guardrails**, instantly scaling difficulty to find their upper limit and shortening the test duration.
+
+### Integrity Shield
+A proprietary monitoring system using gaze-tracking and browser-lock sensors to detect AI-assisted answering, script-reading, or secondary device usage.
 
 ---
 
-## ✨ Key Features
+## 🏗 Recruiter Dashboard (The Leaderboard)
 
-### For Recruiters
-- **Generative Assessment Engine:** Instantly build custom 10-question MCQ assessments based on any Job Description.
-- **Biometric Proctoring:** Real-time monitoring of tab-switching and identity verification using computer vision (camera).
-- **Global Talent Benchmarking:** Compare your candidate pool against real-time industry data from Silicon Valley to Bengaluru.
-- **AI Interview Scripts:** Automatically generate high-impact interview questions tailored to each candidate's specific assessment gaps.
-- **Infrastructure Dashboard:** Manage multiple pipelines with automated pass/fail gating and "ghosting prevention" logic.
+Recruiters are presented with a **Leaderboard** designed to eliminate review fatigue:
+- **Green Tier:** Ready for immediate interview. Verified proof points.
+- **Yellow Tier:** Niche potential. Specific gaps identified.
+- **Red Tier:** Failed gating or Integrity Shield violations.
 
-### For Candidates
-- **Verified Skill Passport:** Earn portable certifications for technical skills that can be shared with other ScreenIQ-partnered employers.
-- **Adaptive Evaluation:** Testing difficulty scales in real-time based on logic patterns and solving speed.
-- **Growth Insights:** Receive a "Personalized Learning Path" based on missed assessment topics to help you improve.
+**One-Sentence Verdicts:** No more long reports. See exactly why a candidate matches or fails in a single line. *"Exceptional logic, but lacked hands-on experience with the specific version required."*
+
+---
+
+## 💰 2026 Hybrid Revenue Model
+
+- **Micro-Transactions:** $2 per completed "Screen." 1/15th the cost of human review.
+- **Enterprise Tier:** Unlimited monthly screens for planetary-scale campus hiring.
+- **Candidate Premium:** A $10/month "RoleScreen Verified" badge for LinkedIn signaling high integrity and skill accuracy.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Framework:** React 19 (ES6 Modules)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **AI Engine:** Google Gemini SDK (`@google/genai`)
-- **Animations:** Framer Motion
-- **Data Visualization:** Recharts
-- **Icons:** Lucide React
+- **AI Framework:** Google Gemini 3.0 (intersection engine & evaluation logic)
+- **Frontend:** React 19, Tailwind CSS
+- **Integrity Layer:** Computer Vision (Camera) & Visibility APIs
 
----
-
-## 🚦 Getting Started
-
-### Prerequisites
-- Node.js installed
-- A Google AI Studio API Key (Gemini)
-
-### Environment Variables
-The application requires a valid Gemini API key to function. This key is accessed via `process.env.API_KEY`. 
-
-### Installation
-1. Clone the repository.
-2. Ensure you have the dependencies listed in the `importmap` within `index.html`.
-3. Set up your environment variable:
-   ```bash
-   # Conceptually for your execution environment
-   API_KEY=your_gemini_api_key_here
-   ```
-
----
-
-## 🏗 System Architecture
-
-The project follows a clean, view-based architecture:
-- `views/`: Contains the primary pages (Landing, Dashboard, Job Detail, Assessment, etc.).
-- `services/`: Handles all interactions with the Google Gemini API.
-- `types.ts`: Centralized TypeScript definitions for the entire platform.
-- `App.tsx`: Main router and state orchestration layer.
-
----
-
-## 🛡 Security & Integrity
-ScreenIQ is built with a "Trustless Recruitment" philosophy. 
-- **Integrity Pulse:** Logs tab-switches and camera interruptions.
-- **Anonymization Mode:** Recruiters can toggle an "Elite Talent" view to eliminate unconscious bias until the interview stage.
-
----
-
-## 📄 License
-This project is for conceptual demonstration purposes. Distributed under the MIT License.
-
----
-
-*Built by World-Class Frontend Engineers using Google Gemini AI.*
+*RoleScreen AI is the Zero-Knowledge Proof for talent.*

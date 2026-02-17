@@ -4,8 +4,9 @@ export enum CandidateStatus {
   APPLIED = 'APPLIED',
   ASSESSMENT_PENDING = 'ASSESSMENT_PENDING',
   ASSESSMENT_COMPLETED = 'ASSESSMENT_COMPLETED',
-  SHORTLISTED = 'SHORTLISTED',
-  REJECTED = 'REJECTED',
+  SHORTLISTED = 'SHORTLISTED', // GREEN
+  POTENTIAL = 'POTENTIAL',     // YELLOW
+  REJECTED = 'REJECTED',       // RED
   INTERVIEW_SCHEDULED = 'INTERVIEW_SCHEDULED',
   INVITED_TO_ASSESSMENT = 'INVITED_TO_ASSESSMENT',
   ON_HOLD = 'ON_HOLD'
@@ -16,11 +17,12 @@ export type ConfidenceLevel = 'unsure' | 'somewhat' | 'certain';
 export interface Question {
   id: string;
   text: string;
-  type: 'multiple_choice' | 'short_answer' | 'code';
+  type: 'multiple_choice' | 'short_answer' | 'truth_check';
   options?: string[];
   correctAnswer?: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'elite';
   skill: string;
+  isTruthQuestion?: boolean; // Intersection Engine generated
 }
 
 export interface KnockoutQuestion {
@@ -92,13 +94,15 @@ export interface Candidate {
     score?: number; 
     suitability?: number; 
     feedback?: string;
+    oneSentenceVerdict?: string; // RoleScreen AI feature
     answers?: Record<string, CandidateAnswer>;
     skillBreakdown?: Record<string, number>;
     appliedAt: string;
     confidenceScore?: number;
-    integrityScore?: number;
+    integrityScore?: number; // Integrity Shield score
     tabSwitches?: number;
     multiplePersonsDetected?: boolean;
+    gazeAnomalyDetected?: boolean; // Eye tracking
     isStarred?: boolean;
     integrityFlag?: boolean;
     notified?: boolean;
