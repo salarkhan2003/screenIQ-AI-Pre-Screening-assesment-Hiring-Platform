@@ -6,89 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RoleScreen | AI Verification Infrastructure</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Bento:wght@900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-          --ios-bg: #f2f2f7;
-          --ios-bg-dark: #000000;
-        }
-        body { 
-          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
-          scroll-behavior: smooth;
-          -webkit-font-smoothing: antialiased;
-          background: black;
-          color: white;
-          margin: 0;
-        }
-        .squircle {
-          border-radius: 44px;
-        }
-        .glass-ios {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(25px) saturate(180%);
-          -webkit-backdrop-filter: blur(25px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .glass-ios-dark {
-          background: rgba(28, 28, 30, 0.6);
-          backdrop-filter: blur(25px) saturate(180%);
-          -webkit-backdrop-filter: blur(25px) saturate(180%);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .text-bold-caps {
-          font-weight: 800;
-          letter-spacing: -0.02em;
-        }
-        
-        @keyframes gradient-x {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-gradient-x {
-          background-size: 200% 200%;
-          animation: gradient-x 5s ease infinite;
-        }
-
-        .ios-3d-card {
-          transform-style: preserve-3d;
-          transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        .ios-3d-card:hover {
-          transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
-        }
-
-        /* Hide Scrollbar */
-        ::-webkit-scrollbar { width: 0px; height: 0px; }
-        
-        /* Smooth Entrance */
-        .fade-in-ios {
-          animation: iosFadeIn 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-        @keyframes iosFadeIn {
-          from { opacity: 0; transform: translateY(20px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
 <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "react/": "https://esm.sh/react@^19.2.4/",
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4",
-    "framer-motion": "https://esm.sh/framer-motion@^12.34.1",
     "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.574.0",
     "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
-    "recharts": "https://esm.sh/recharts@^3.7.0"
+    "lucide-react": "https://esm.sh/lucide-react@^0.574.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.34.1",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4"
   }
 }
 </script>
 </head>
 <body class="bg-black text-white selection:bg-indigo-500/40">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>

@@ -1,0 +1,70 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ios-bg: #f2f2f7;
+    --ios-bg-dark: #000000;
+  }
+  
+  body {
+    @apply bg-black text-white antialiased;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .squircle {
+    border-radius: 44px;
+  }
+
+  .glass-ios {
+    @apply bg-white/70 backdrop-blur-[25px] saturate-[180%] border border-white/20;
+  }
+
+  .glass-ios-dark {
+    @apply bg-zinc-900/60 backdrop-blur-[25px] saturate-[180%] border border-white/10;
+  }
+
+  .text-bold-caps {
+    @apply font-extrabold tracking-tighter;
+  }
+
+  .ios-3d-card {
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .ios-3d-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+  }
+
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 5s ease infinite;
+  }
+}
+
+@keyframes gradient-x {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Hide Scrollbar */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+.fade-in-ios {
+  animation: iosFadeIn 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes iosFadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

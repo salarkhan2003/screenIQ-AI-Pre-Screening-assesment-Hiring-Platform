@@ -2,14 +2,22 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Job, Question, CandidateAnswer } from "../types";
 
-// Always use named parameters for initialization and exclusively use process.env.API_KEY.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Helper to get an instance of GoogleGenAI dynamically.
+// This ensures we always use the latest environment variable.
+const getAI = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    console.error("Gemini API Key is missing. Please ensure process.env.API_KEY is configured.");
+  }
+  return new GoogleGenAI({ apiKey: apiKey || '' });
+};
 
 const cleanAIResponse = (text: string) => {
   return text.replace(/[#*`]/g, '').trim();
 };
 
 export const optimizeJobDescription = async (job: Partial<Job>) => {
+  const ai = getAI();
   const prompt = `Optimize this JD for RoleScreen AI (2026 hiring landscape). 
     Detect unrealistic skill combinations.
     Title: ${job.title}
@@ -21,11 +29,11 @@ export const optimizeJobDescription = async (job: Partial<Job>) => {
     contents: prompt,
   });
 
-  // Accessing text as a property, not a method, as per guidelines.
   return cleanAIResponse(response.text || '');
 };
 
 export const getAssessmentBriefing = async (job: Job) => {
+  const ai = getAI();
   const prompt = `Provide a concise 10-Bit Assessment Briefing for:
     Title: ${job.title}
     Skills: ${job.skills.join(', ')}
@@ -40,8 +48,8 @@ export const getAssessmentBriefing = async (job: Job) => {
   return cleanAIResponse(response.text || '');
 };
 
-// Use gemini-3-pro-preview for complex reasoning task: generating an assessment based on JD and resume context.
 export const generateAssessment = async (job: Job, candidateResume?: string): Promise<Question[]> => {
+  const ai = getAI();
   const context = candidateResume ? `Candidate Resume Context: ${candidateResume}` : "No resume provided yet.";
   
   const response = await ai.models.generateContent({
@@ -91,12 +99,12 @@ export const generateAssessment = async (job: Job, candidateResume?: string): Pr
   }
 };
 
-// Use gemini-3-pro-preview for complex reasoning task: evaluating assessment performance and providing feedback.
 export const evaluateAssessment = async (
   job: Job, 
   questions: Question[], 
   answers: Record<string, CandidateAnswer>
 ) => {
+  const ai = getAI();
   const qaString = questions.map(q => {
     const ans = answers[q.id];
     const isCorrect = ans?.value === q.correctAnswer;
@@ -162,8 +170,8 @@ export const evaluateAssessment = async (
   }
 };
 
-// Use gemini-3-pro-preview for complex reasoning task: generating deep-dive interview questions.
 export const generateInterviewScript = async (job: Job, feedback: string, skills: string[]) => {
+  const ai = getAI();
   const prompt = `Generate 5 deep-dive interview questions for ${job.title}.
     Focus on gaps: ${feedback}.
     Target skills: ${skills.join(', ')}.
